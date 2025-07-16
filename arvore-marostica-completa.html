@@ -1,0 +1,77 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Árvore Genealógica - Maróstica</title>
+  <style>
+    body {{
+      font-family: Arial, sans-serif;
+      margin: 0;
+      overflow: hidden;
+    }}
+    .node rect {{
+      fill: #f3f4f6;
+      stroke: #333;
+      stroke-width: 1.5px;
+      rx: 10;
+      ry: 10;
+    }}
+    .node text {{
+      font: 14px sans-serif;
+      pointer-events: none;
+    }}
+    .link {{
+      fill: none;
+      stroke: #999;
+      stroke-width: 1.5px;
+    }}
+  </style>
+</head>
+<body>
+  <svg width="100%" height="100%"></svg>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script>
+    const treeData = {"name": "Giovanni Angonese", "spouse": "Maria Grassian", "children": [{"name": "Giuseppe Angonese (26 maio 1848 – 31 maio 1887)", "spouse": "Lúcia Colpo (cas. 24 mar 1872; +c.1886)", "children": [{"name": "Giovanni Battista Angonese (19 nov 1872 – 5 jan 1949)", "spouse": "Genoveffa Moser (cas. 1903; +14 out 1941)", "children": [{"name": "Ida Angonese", "birth": "1903"}, {"name": "Joseph Angonese (20 out 1906 – 5 nov 1974)", "spouse": "Marguerite Giltaire (25 jun 1906 – 3 nov 1972)", "children": [{"name": "Roger Angonese (3 out 1932 – ?)", "spouse": "Claudine Cocu (22 jul 1931 – 10 out 2018)", "children": [{"name": "Fabien Roger Lucien Jean Angonese"}, {"name": "Carole Angonese"}]}, {"name": "Enrico Angonese (1907 – 1979)"}, {"name": "Lucie Angonese (1911 – 1982)"}, {"name": "Emma Angonese (1914 – 1993)"}, {"name": "Irma Angonese (1917 – 2007)"}]}, {"name": "Gio Batta / João Angonese (6 out 1875 – 3 ago 1948)", "spouse": "Maria Bortolozo (n.1885; cas. 5 set 1905)", "children": [{"name": "Tereza Angonese"}, {"name": "José Angonese"}, {"name": "Luciano Angonese"}, {"name": "Antonio Angonese"}, {"name": "Ângelo Angonese"}, {"name": "Ernesto Francisco Angonese"}, {"name": "Amábile Angonese"}, {"name": "Irma Angonese"}]}, {"name": "Maria Angonese (23 ago 1877 – 13 jun 1879)"}, {"name": "Maria Pellegrina Angonese (2 jul 1880 – ?)", "spouse": "Paulo Manzoni", "children": []}]}, {"name": "Giuseppe Angonese (cas. dez 1888 com Maria Madalena Galván)", "children": [{"name": "Antonio Angonese (1 ago 1889)"}, {"name": "Gio Batta Angonese (22 jul 1890)"}, {"name": "Luigi Angonese (2 jun 1891 – 28 jun 1891)"}]}]}]};
+
+    const svg = d3.select("svg"),
+          width = window.innerWidth,
+          height = window.innerHeight,
+          g = svg.append("g").attr("transform", "translate(40,0)");
+
+    const zoom = d3.zoom()
+        .scaleExtent([0.2, 2])
+        .on("zoom", (event) => g.attr("transform", event.transform));
+    svg.call(zoom);
+
+    const treeLayout = d3.tree().nodeSize([200, 100]);
+    const root = d3.hierarchy(treeData);
+    treeLayout(root);
+
+    const link = g.selectAll(".link")
+      .data(root.links())
+      .join("path")
+        .attr("class", "link")
+        .attr("d", d3.linkVertical()
+                    .x(d => d.x)
+                    .y(d => d.y));
+
+    const node = g.selectAll(".node")
+      .data(root.descendants())
+      .join("g")
+        .attr("class", "node")
+        .attr("transform", d => `translate(${d.x},${d.y})`);
+
+    node.append("rect")
+        .attr("x", -90)
+        .attr("y", -20)
+        .attr("width", 180)
+        .attr("height", 40);
+
+    node.append("text")
+        .attr("dy", 5)
+        .attr("text-anchor", "middle")
+        .text(d => d.data.spouse ? `${d.data.name} ✚ ${d.data.spouse}` : d.data.name);
+  </script>
+</body>
+</html>
